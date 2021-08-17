@@ -68,7 +68,7 @@ async def uap(ctx):
         MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), date)
 
 @bot.command(name="change_date", help="change date of presentation for a user! \nformat: change_date @user paper_name date")
-async def uap(ctx):
+async def change_date(ctx):
     #### FIND USERID FROM CTX.MESSAGE.MENTIONS ####
     msg = ctx.split()
     _, _, paper_name, date, paper_link = msg
@@ -77,5 +77,5 @@ async def uap(ctx):
 ##--- Unnecessary stuff ---##
 
 @bot.command(name="religion")
-async def namenum(ctx):
+async def religion(ctx):
     await ctx.send('All hail the great highness, the untouchable one, his hotness himself, the unspeakable Hugo!')
