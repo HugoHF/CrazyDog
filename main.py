@@ -5,7 +5,7 @@ import discord
 from discord import File
 from discord.ext import commands
 from discord.ext.commands import Bot
-
+from random import choice
 # from dotenv import load_dotenv
 # load_dotenv()
 # TOKEN = os.getenv("TOKEN")
@@ -38,11 +38,13 @@ class Speaker:
     def update(self):
         self.name = get_nickname(self.id)
 
-    def update(self, date):
+    def update_time(self, date):
         self.date = date
+        return self
 
     def add_paper(self, paper, date):
         self.papers.append((paper,date))
+        return self
 
     def represent(self):
         self.update()
@@ -53,11 +55,12 @@ class Speaker:
         return self.papers
 
 
-
+##--- Manage Speakers ---##
 
 @bot.command(name="uap", help="user add presentation: add a new presentation to a member!\nformat: uap @user paper_name date link")
 async def uap(ctx):
-    ### USERID HAS TO BE GOTTEN FROM CTX.MESSAGE.MENTIONS ####
+    global MasterDict
+    userid = ctx.message.mentions[0]
     username = bot.get_user(userid).name
     msg = ctx.split()
     _, _, paper_name, date, paper_link = msg
@@ -69,13 +72,23 @@ async def uap(ctx):
 
 @bot.command(name="change_date", help="change date of presentation for a user! \nformat: change_date @user paper_name date")
 async def change_date(ctx):
-    #### FIND USERID FROM CTX.MESSAGE.MENTIONS ####
+    global MasterDict
+    userid = ctx.message.mentions[0]
     msg = ctx.split()
-    _, _, paper_name, date, paper_link = msg
-    #### HERE SPEAKER.UDPATE_TIME SHOULD BE CALLED ####
+    _, _, paper_name, date = msg
+    MasterDict[userid] = MasterDict[userid].update_time(paper_name, date)
+
 
 ##--- Unnecessary stuff ---##
 
 @bot.command(name="religion")
 async def religion(ctx):
     await ctx.send('All hail the great highness, the untouchable one, his hotness himself, the unspeakable Hugo!')
+
+@bot.event
+async def on_message(message):
+    await bot.process_commands(message)
+    if message.author.bot: return
+    if message.content.lower() == "hello":
+        msg = choice([f"Wazzup, {message.author.name}", f"Yo {message.author.name}, whats poppin'!", f"All good under the hood?",f"Hey {message.author.name}, how are you today?"])
+        await message.channel.send(msg)
