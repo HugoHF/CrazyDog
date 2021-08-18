@@ -35,6 +35,10 @@ class Speaker:
         self.papers = [(paper, date)]
         return self
 
+    def name(self):
+        self.update()
+        return self.name
+
     def update(self):
         self.name = get_nickname(self.id)
 
@@ -51,8 +55,8 @@ class Speaker:
         string = f"presentations made by {name}:\n"
         for i in self.papers:
             string += f"\n \" {self.papers[i][0].name} \" , {self.papers[i][1]} \n {self.papers[i][0].link} \n"
-            # paper, name, \n link
-        return self.papers
+            # paper, date, \n link
+        return string
 
 
 ##--- Manage Speakers ---##
@@ -70,6 +74,8 @@ async def uap(ctx):
     else:
         MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), date)
 
+
+
 @bot.command(name="change_date", help="change date of presentation for a user! \nformat: change_date @user paper_name date")
 async def change_date(ctx):
     global MasterDict
@@ -78,6 +84,24 @@ async def change_date(ctx):
     _, _, paper_name, date = msg
     MasterDict[userid] = MasterDict[userid].update_time(paper_name, date)
 
+#### STILL ERASE FUNCTION ####
+
+##--- print out info ---##
+
+@bot.command(name="history", help="give out a list of papers the given person is an expert on! \nformat: history @user")
+async def history(ctx):
+    global MasterDict
+    userid = ctx.message.mentions[0]
+    await ctx.send(MasterDict[userid].represent())
+
+@bot.command(name="papers", help="give out a list of papers that have already been held in the past or are scheduled for soon!")
+async def papers(ctx):
+    global MasterDict
+    string = f"papers prepared in the past:\n"
+    for speaker in MasterDict.values():
+        for paper in speaker.papers:
+            string += f"\n \" {paper[0].name} \" \nheld by {speaker.name()} on {paper[1]} \n{paper[0].link} \n"
+    await ctx.send(string)
 
 ##--- Unnecessary stuff ---##
 
