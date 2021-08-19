@@ -42,8 +42,14 @@ class Speaker:
     def update(self):
         self.name = get_nickname(self.id)
 
-    def update_time(self, date):
-        self.date = date
+    def update_time(self, paper, date):
+        index = [i for i in range(len(self.papers)) if self.papers[i][0].name == paper][0]
+        self.papers[index][1] = date
+        return self
+
+    def cancel_presentation(self, paper, date):
+        index =  [i for i in range(len(self.papers)) if self.papers[i][0].name == paper and self.papers[i][1] == date][0]
+        del self.papers[index]
         return self
 
     def add_paper(self, paper, date):
@@ -84,7 +90,15 @@ async def change_date(ctx):
     _, _, paper_name, date = msg
     MasterDict[userid] = MasterDict[userid].update_time(paper_name, date)
 
-#### STILL ERASE FUNCTION ####
+
+
+@bot.command(name="cap", help="cancel presentation for a user! \nformat: cap @user paper_name date")
+async def cap(ctx):
+    global MasterDict
+    userid = ctx.message.mentions[0]
+    msg = ctx.split()
+    _, _, paper_name, date = msg
+    MasterDict[userid] = MasterDict[userid].cancel_presentation(paper_name, date)
 
 ##--- print out info ---##
 
