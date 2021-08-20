@@ -5,7 +5,7 @@ import discord
 from discord import File
 from discord.ext import commands
 from discord.ext.commands import Bot
-from random import choice
+import datetime
 # from dotenv import load_dotenv
 # load_dotenv()
 # TOKEN = os.getenv("TOKEN")
@@ -18,6 +18,24 @@ async def on_ready():
 
 MasterDict = {}
 
+class TBA:
+    def __init__(self):
+        pass
+    def strftime(self, nothing):
+        return "tba"
+    def __repr__(self):
+        return "tba"
+
+def get_date(date):
+    if date == "TBA" or date == "tba":
+        return TBA()
+    else:
+        L = date.split("/")
+        if len(L) != 2:
+            pass ######EEEEERRRORRR MANAGEMENT: RESPOND TO MESSAGES!!########
+        else:
+            year = datetime.datetime.now().year
+            return datetime.datetime(year, L[1], L[0])
 
 def get_nickname(id):
     global bot
@@ -60,7 +78,7 @@ class Speaker:
         self.update()
         string = f"presentations made by {name}:\n"
         for i in self.papers:
-            string += f"\n \" {self.papers[i][0].name} \" , {self.papers[i][1]} \n {self.papers[i][0].link} \n"
+            string += f"""\n \" {self.papers[i][0].name} \" , {self.papers[i][1].strftime("%x")} \n {self.papers[i][0].link} \n"""
             # paper, date, \n link
         return string
 
@@ -76,29 +94,29 @@ async def uap(ctx):
     _, _, paper_name, date, paper_link = msg
 
     if userid in MasterDict.keys():
-        MasterDict[userid] = MasterDict[userid].add_paper(Paper(paper_name, paper_link), date)
+        MasterDict[userid] = MasterDict[userid].add_paper(Paper(paper_name, paper_link), get_date(date))
     else:
-        MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), date)
+        MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), get_date(date))
 
 
 
-@bot.command(name="change_date", help="change date of presentation for a user! \nformat: change_date @user paper_name date")
+@bot.command(name="change_date", help="change date of presentation for a user! \nformat: change_date @user paper_name date (format: day/month)")
 async def change_date(ctx):
     global MasterDict
     userid = ctx.message.mentions[0]
     msg = ctx.split()
     _, _, paper_name, date = msg
-    MasterDict[userid] = MasterDict[userid].update_time(paper_name, date)
+    MasterDict[userid] = MasterDict[userid].update_time(paper_name, get_date(date))
 
 
 
-@bot.command(name="cap", help="cancel presentation for a user! \nformat: cap @user paper_name date")
+@bot.command(name="cap", help="cancel presentation for a user! \nformat: cap @user paper_name date (format: day/month)")
 async def cap(ctx):
     global MasterDict
     userid = ctx.message.mentions[0]
     msg = ctx.split()
     _, _, paper_name, date = msg
-    MasterDict[userid] = MasterDict[userid].cancel_presentation(paper_name, date)
+    MasterDict[userid] = MasterDict[userid].cancel_presentation(paper_name, get_date(date))
 
 ##--- print out info ---##
 
