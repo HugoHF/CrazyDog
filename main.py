@@ -32,7 +32,7 @@ def get_date(date):
     else:
         L = date.split("/")
         if len(L) != 2:
-            pass ######EEEEERRRORRR MANAGEMENT: RESPOND TO MESSAGES!!########
+            return False
         else:
             year = datetime.datetime.now().year
             return datetime.datetime(year, L[1], L[0])
@@ -48,7 +48,6 @@ class Paper:
 
 class Speaker:
     def __init__(self, id, name, paper, date):
-        ### IF DATE IS A DATE (AND NOT TBA), USE PYTHON DATE FORMAT #####
         self.id, self.name = id, name
         self.papers = [(paper, date)]
         return self
@@ -88,35 +87,58 @@ class Speaker:
 @bot.command(name="uap", help="user add presentation: add a new presentation to a member!\nformat: uap @user paper_name date link")
 async def uap(ctx):
     global MasterDict
-    userid = ctx.message.mentions[0]
+    try:
+        userid = ctx.message.mentions[0]
+    except IndexError:
+        ctx.send(f"No user mentioned! Expected format: uap @user paper_name date link")
+        return
     username = bot.get_user(userid).name
     msg = ctx.split()
-    _, _, paper_name, date, paper_link = msg
-
-    if userid in MasterDict.keys():
-        MasterDict[userid] = MasterDict[userid].add_paper(Paper(paper_name, paper_link), get_date(date))
+    _, _, paper_name, date_raw, paper_link = msg
+    date = get_date(date_raw)
+    if not date:
+        ctx.send(f"Wrong date format! Expected format: day/month ; e.g.: 420/69 \ngotten: {date_raw}")
+        return
+    elif userid in MasterDict.keys():
+        MasterDict[userid] = MasterDict[userid].add_paper(Paper(paper_name, paper_link), date)
     else:
-        MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), get_date(date))
+        MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), date)
 
 
 
 @bot.command(name="change_date", help="change date of presentation for a user! \nformat: change_date @user paper_name date (format: day/month)")
 async def change_date(ctx):
     global MasterDict
-    userid = ctx.message.mentions[0]
+    try:
+        userid = ctx.message.mentions[0]
+    except IndexError:
+        ctx.send(f"No user mentioned! Expected format: change_date @user paper_name date")
+        return
     msg = ctx.split()
-    _, _, paper_name, date = msg
-    MasterDict[userid] = MasterDict[userid].update_time(paper_name, get_date(date))
+    _, _, paper_name, date_raw = msg
+    date = get_date(date_raw)
+    if not date:
+        ctx.send(f"Wrong date format! Expected format: day/month ; e.g.: 420/69 \ngotten: {date_raw}")
+        return
+    MasterDict[userid] = MasterDict[userid].update_time(paper_name, date)
 
 
 
 @bot.command(name="cap", help="cancel presentation for a user! \nformat: cap @user paper_name date (format: day/month)")
 async def cap(ctx):
     global MasterDict
-    userid = ctx.message.mentions[0]
+    try:
+        userid = ctx.message.mentions[0]
+    except IndexError:
+        ctx.send(f"No user mentioned! Expected format: cap @user paper_name date")
+        return
     msg = ctx.split()
-    _, _, paper_name, date = msg
-    MasterDict[userid] = MasterDict[userid].cancel_presentation(paper_name, get_date(date))
+    _, _, paper_name, date_raw = msg
+    date = get_date(date_raw)
+    if not date:
+        ctx.send(f"Wrong date format! Expected format: day/month ; e.g.: 420/69 \ngotten: {date_raw}")
+        return
+    MasterDict[userid] = MasterDict[userid].cancel_presentation(paper_name, date)
 
 ##--- print out info ---##
 
