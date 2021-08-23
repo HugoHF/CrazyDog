@@ -89,7 +89,7 @@ async def uap(ctx):
     global MasterDict
 
     try:
-        userid = ctx.message.mentions[0]
+        userid = ctx.message.mentions[0].id
     except IndexError:
         ctx.send(f"No user mentioned! Expected format: !uap @user paper_name date link")
         ctx.message.add_reaction(":x:")
@@ -109,10 +109,14 @@ async def uap(ctx):
         ctx.send(f"Wrong date format! Expected format: day/month ; e.g.: 420/69 \ngotten: {date_raw}")
         ctx.message.add_reaction(":x:")
         return
+
     elif userid in MasterDict.keys():
         MasterDict[userid] = MasterDict[userid].add_paper(Paper(paper_name, paper_link), date)
     else:
+        print("Hi naomi pls tell me if this message appears")
         MasterDict[userid] = Speaker(userid, username, Paper(paper_name, paper_link), date)
+        print("If this one also does (but it still doesnt work) its bad")
+
     ctx.message.add_reaction(":white_check_mark:")
 
 
@@ -122,7 +126,7 @@ async def change_date(ctx):
     global MasterDict
 
     try:
-        userid = ctx.message.mentions[0]
+        userid = ctx.message.mentions[0].id
     except IndexError:
         ctx.send(f"No user mentioned! Expected format: !change_date @user paper_name date")
         ctx.message.add_reaction(":x:")
@@ -151,7 +155,7 @@ async def cap(ctx):
     global MasterDict
 
     try:
-        userid = ctx.message.mentions[0]
+        userid = ctx.message.mentions[0].id
     except IndexError:
         ctx.send(f"No user mentioned! Expected format: !cap @user paper_name date")
         ctx.message.add_reaction(":x:")
@@ -178,7 +182,7 @@ async def cap(ctx):
 @bot.command(name="history", help="give out a list of papers the given person is an expert on! \nformat: !history @user")
 async def history(ctx):
     global MasterDict
-    userid = ctx.message.mentions[0]
+    userid = ctx.message.mentions[0].id
     await ctx.send(MasterDict[userid].represent())
 
 @bot.command(name="papers", help="give out a list of papers that have already been held in the past or are scheduled for soon!")
