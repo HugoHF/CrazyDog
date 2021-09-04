@@ -17,7 +17,7 @@ async def on_ready():
     print('- online -')
 
 
-MasterDict = {}
+MasterDict = {"rules":"no rules set yet!"}
 
 class TBA:
     def __init__(self):
@@ -196,6 +196,27 @@ async def papers(ctx):
     await ctx.send(string)
 
 ##--- Unnecessary stuff ---##
+
+@bot.command(name="set_rules", help="give a set of rules for BOT NAME to remember")
+async def set_rules(ctx):
+    global MasterDict
+    msg = ctx.split()
+    try:
+        _, string = msg
+    except ValueError:
+        ctx.send(f"No rules found in your message! Format: !set_rules rules")
+        ctx.message.add_reaction(":x:")
+        return
+
+    MasterDict["rules"] = string
+    ctx.message.add_reaction(":white_check_mark:")
+
+
+@bot.command(name="rules", help="the almighty ruleset! Disobedience will not be tolerated!")
+async def rules(ctx):
+    global MasterDict
+    await ctx.send(MasterDict["rules"])
+
 
 @bot.command(name="religion")
 async def religion(ctx):
